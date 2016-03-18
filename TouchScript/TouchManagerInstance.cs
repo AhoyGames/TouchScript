@@ -714,22 +714,24 @@ namespace TouchScript
             touchListPool.Release(redispatchList);
         }
 
+    public void UpdateBeganTouches() {
+      // need to copy buffers here since they might get updated during execution
+      if (touchesBegan.Count > 0) {
+        var updateList = touchPointListPool.Get();
+        lock (touchesBegan) {
+          updateList.AddRange(touchesBegan);
+          touchesBegan.Clear();
+        }
+        updateBegan(updateList);
+        touchPointListPool.Release(updateList);
+      }
+    }
+
         private void updateTouches()
         {
             if (frameStartedInvoker != null) frameStartedInvoker.InvokeHandleExceptions(this, EventArgs.Empty);
 
-            // need to copy buffers here since they might get updated during execution
-            if (touchesBegan.Count > 0)
-            {
-                var updateList = touchPointListPool.Get();
-                lock (touchesBegan)
-                {
-                    updateList.AddRange(touchesBegan);
-                    touchesBegan.Clear();
-                }
-                updateBegan(updateList);
-                touchPointListPool.Release(updateList);
-            }
+      UpdateBeganTouches();
 
             if (touchesUpdated.Count > 0)
             {
@@ -741,7 +743,7 @@ namespace TouchScript
                 }
                 updateUpdated(updateList);
                 intListPool.Release(updateList);
-            }
+      }
 
             if (touchesEnded.Count > 0)
             {
@@ -753,7 +755,7 @@ namespace TouchScript
                 }
                 updateEnded(updateList);
                 intListPool.Release(updateList);
-            }
+      }
 
             if (touchesCancelled.Count > 0)
             {

@@ -178,6 +178,8 @@ namespace TouchScript
         /// </summary>
         /// <param name="id">Touch id to cancel.</param>
         void CancelTouch(int id);
+
+    void UpdateBeganTouches();
     }
 
     /// <summary>
